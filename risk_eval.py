@@ -44,6 +44,7 @@ def main():
     st.title("AI Risk Evaluation Session")
 
     user_choices = display_situations(situations)
+    show_feedback = False
 
     # if st.button("Reveal"):
     #     st.subheader("Your Selections:")
@@ -51,6 +52,7 @@ def main():
     #         st.write(f"{situation}: {choice}")
 
     if st.button("Reveal"):
+        show_feedback = True
         results = compare_choices(user_choices, correct_answers)
         for situation, (user_choice, correct_choice) in results.items():
             if user_choice == correct_choice:
@@ -58,7 +60,12 @@ def main():
             else:
                 st.error(
                     f"{situation}: Incorrect. You chose {user_choice}, but the correct category is {correct_choice}")
-
+    # Text area for user feedback
+    if show_feedback:
+        st.subheader("Your Thoughts")
+        user_feedback = st.text_area("What do you think about your results and the categorization exercise?")
+        if user_feedback:
+            st.write("Thank you for your feedback!")
         # Compare with correct answers (you need to define the correct answers)
         # Display comparison results and feedback
 
