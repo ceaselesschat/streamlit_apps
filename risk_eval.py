@@ -30,14 +30,23 @@ correct_answers = {
 }
 
 COL_RANGE = 'A:D'
+if 'user_name' not in st.session_state:
+    st.session_state['user_name'] = ""
+
+if 'feedback' not in st.session_state:
+    st.session_state['feedback'] = ""
+
+if "choices" not in st.session_state:
+    st.session_state['choices'] = {}
 
 # Storing responses in google sheets
 
 
-def store_query(user_name, situation, user_choice, thoughts):
+def store_query():
     sheet_url = st.secrets["private_gsheets_url"]["spreadsheet"]
     sheet = client.open_by_url(sheet_url).get_worksheet(0)
-    sheet.append_row([user_name, situation, user_choice, thoughts], table_range=COL_RANGE)
+    for situation, user_choice in st.session_state["choices"].items():
+        sheet.append_row([st.session_state['user_name'], situation, user_choice, st.session_state["feedback"]], table_range=COL_RANGE)
     return
 
 
@@ -69,17 +78,17 @@ def main():
 
     st.title("AI Risk Evaluation Session")
 
-    if 'user_name' not in st.session_state:
-        st.session_state['user_name'] = st.text_input("Please enter your name:")
-    else:
-        st.write(f"Welcome back, {st.session_state['user_name']}!")
+    st.session_state['user_name'] = st.text_input("Please enter your name:")
 
-    user_choices = display_situations(situations)
+    if st.session_state['user_name']:
+        st.write(f"Welcome, {st.session_state['user_name']}!")
+
+    st.session_state["choices"] = display_situations(situations)
     show_feedback = False
 
     if st.button("Reveal"):
-        show_feedback = True
-        results = compare_choices(user_choices, correct_answers)
+        # show_feedback = True
+        results = compare_choices(st.session_state["choices"], correct_answers)
         for situation, (user_choice, correct_choice) in results.items():
             if user_choice == correct_choice:
                 st.success(f"{situation}: Correct! You chose {user_choice}")
@@ -87,14 +96,13 @@ def main():
                 st.error(
                     f"{situation}: Incorrect. You chose {user_choice}, but the correct category is {correct_choice}")
 
-    if show_feedback:
+    # if show_feedback:
         st.subheader("Your Thoughts")
-        user_feedback = st.text_area("What do you think about your results and the categorization exercise?")
-        if user_feedback:
-            # Call store_query for each situation
-            for situation, user_choice in user_choices.items():
-                store_query(st.session_state['user_name'], situation, user_choice, user_feedback)
-            st.write("Thank you for your feedback!")
+        st.text_input("What do you think about your results and the categorization exercise?", key="feedback", on_change=store_query)
+    # # Separate button to handle data storage
+    #     if st.button("Submit Feedback", on_click=store_query):
+    #         print("checking if its in")
+    #         st.write("Thank you for your feedback!")
 
 
 
