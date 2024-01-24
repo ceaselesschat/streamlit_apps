@@ -1,4 +1,10 @@
 import streamlit as st
+from streamlit_gsheets import GSheetsConnection
+
+# Create a connection object.
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+df = conn.read()
 
 # Define your risk categories
 risk_categories = ["Low Risk", "Medium Risk", "Moderately-High Risk", "High Risk"]
