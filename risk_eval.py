@@ -40,7 +40,7 @@ def store_query():
         # query_embed,
         # response_embed):
 
-    sheet_url = st.secrets["private_gsheets_url"]  # this information should be included in streamlit secret
+    sheet_url = st.secrets["private_gsheets_url"]["spreadsheet"]  # this information should be included in streamlit secret
     sheet = client.open_by_url(sheet_url).get_worksheet(0)
     # existing_data = sheet.get(COL_RANGE)
     # existing_data.append([query, response])
