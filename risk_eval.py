@@ -39,6 +39,26 @@ if 'feedback' not in st.session_state:
 if "choices" not in st.session_state:
     st.session_state['choices'] = {}
 
+if "displayon" not in st.session_state:
+    st.session_state['displayon'] = False
+
+
+# def submit():
+#     st.session_state.feedback = st.session_state.widget
+#     st.session_state.widget = ""
+
+def submit():
+    st.session_state.feedback = st.session_state.widget
+    sheet_url = st.secrets["private_gsheets_url"]["spreadsheet"]  # this information should be included in streamlit secret
+    sheet = client.open_by_url(sheet_url).get_worksheet(0)
+    q_list = sheet.col_values(1)
+    rows = len(q_list)
+    # print(st.session_state.query)
+    if q_list[rows - 1] == st.session_state['user_name']:
+        sheet.update(f'D{rows}', st.session_state.feedback)
+    return
+
+
 # Storing responses in google sheets
 
 
@@ -46,7 +66,8 @@ def store_query():
     sheet_url = st.secrets["private_gsheets_url"]["spreadsheet"]
     sheet = client.open_by_url(sheet_url).get_worksheet(0)
     for situation, user_choice in st.session_state["choices"].items():
-        sheet.append_row([st.session_state['user_name'], situation, user_choice, st.session_state["feedback"]], table_range=COL_RANGE)
+        sheet.append_row([st.session_state['user_name'], situation, user_choice, ""], table_range=COL_RANGE)
+    st.session_state.displayon = True
     return
 
 
@@ -84,10 +105,9 @@ def main():
         st.write(f"Welcome, {st.session_state['user_name']}!")
 
     st.session_state["choices"] = display_situations(situations)
-    show_feedback = False
+    st.button("Reveal", key="reveal", on_click=store_query)
 
-    if st.button("Reveal"):
-        # show_feedback = True
+    if st.session_state.displayon:
         results = compare_choices(st.session_state["choices"], correct_answers)
         for situation, (user_choice, correct_choice) in results.items():
             if user_choice == correct_choice:
@@ -95,45 +115,12 @@ def main():
             else:
                 st.error(
                     f"{situation}: Incorrect. You chose {user_choice}, but the correct category is {correct_choice}")
-
-    # if show_feedback:
-        st.subheader("Your Thoughts")
-        st.text_input("What do you think about your results and the categorization exercise?", key="feedback", on_change=store_query)
-    # # Separate button to handle data storage
-    #     if st.button("Submit Feedback", on_click=store_query):
-    #         print("checking if its in")
-    #         st.write("Thank you for your feedback!")
-
-
-
-
-    # st.title("AI Risk Evaluation Session")
-    #
-    # user_choices = display_situations(situations)
-    # show_feedback = False
-    #
-    # # if st.button("Reveal"):
-    # #     st.subheader("Your Selections:")
-    # #     for situation, choice in user_choices.items():
-    # #         st.write(f"{situation}: {choice}")
-    #
-    # if st.button("Reveal", on_click=store_query):
-    #     show_feedback = True
-    #     results = compare_choices(user_choices, correct_answers)
-    #     for situation, (user_choice, correct_choice) in results.items():
-    #         if user_choice == correct_choice:
-    #             st.success(f"{situation}: Correct! You chose {user_choice}")
-    #         else:
-    #             st.error(
-    #                 f"{situation}: Incorrect. You chose {user_choice}, but the correct category is {correct_choice}")
-    # # Text area for user feedback
-    # if show_feedback:
-    #     st.subheader("Your Thoughts")
-    #     user_feedback = st.text_area("What do you think about your results and the categorization exercise?")
-    #     if user_feedback:
-    #         st.write("Thank you for your feedback!")
-    #     # Compare with correct answers (you need to define the correct answers)
-    #     # Display comparison results and feedback
+    st.subheader("Your Thoughts")
+    st.text_input("Please provide feedback!", key="widget", on_change=submit)
+    if st.session_state.feedback:
+        st.write(f"Thank you for your feedback: {st.session_state.feedback}")
+        # store_query()
+        # st.session_state["feedback"] = ""
 
 
 # Run the app
