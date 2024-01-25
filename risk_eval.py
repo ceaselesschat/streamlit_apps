@@ -79,7 +79,7 @@ def display_situations(situations):
     user_choices = {}
     for i, situation in enumerate(situations):
         st.text(situation)
-        choice = st.selectbox(f"Choose category for Situation {i + 1}", risk_categories, key=i)
+        choice = st.selectbox(f"Choose category for Situation {i + 1}", risk_categories, key=i, disabled=st.session_state.displayon)
         user_choices[f"Situation {i + 1}"] = choice
     return user_choices
 
@@ -119,8 +119,6 @@ def main():
     st.text_input("Please provide feedback!", key="widget", on_change=submit)
     if st.session_state.feedback:
         st.write(f"Thank you for your feedback: {st.session_state.feedback}")
-        # store_query()
-        # st.session_state["feedback"] = ""
 
 
 # Run the app
