@@ -41,6 +41,9 @@ sit8 = """Monitoring financial transactions for fraud and anomalies"""
 
 sit9 = """Employee Engagement Analysis: AI can analyze employee feedback from surveys"""
 
+sit10 = """Employee Layoff Predictions and Decisions: AI that not only predicts which employees might be at risk of 
+layoffs but also makes recommendations or decisions about layoffs. """
+
 # List of situations
 situations = [globals()[f"sit{i}"] for i in range(1, 10)]
 
@@ -54,7 +57,8 @@ correct_answers = {
     sit6: r2,
     sit7: r1,
     sit8: r1,
-    sit9: r1
+    sit9: r1,
+    sit10: r4
   # Add correct answers for more situations as needed
 }
 
