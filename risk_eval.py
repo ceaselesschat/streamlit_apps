@@ -45,7 +45,7 @@ sit10 = """Employee Layoff Predictions and Decisions: AI that not only predicts 
 layoffs but also makes recommendations or decisions about layoffs. """
 
 # List of situations
-situations = [globals()[f"sit{i}"] for i in range(1, 10)]
+situations = [globals()[f"sit{i}"] for i in range(1, 11)]
 
 # Define the correct answers
 correct_answers = {
